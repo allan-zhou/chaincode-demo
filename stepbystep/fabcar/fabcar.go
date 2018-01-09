@@ -36,6 +36,8 @@ func (cc *Chaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return cc.changeCarOwner(stub, args)
 	} else if fn == "addCar" {
 		return cc.addCar(stub, args)
+	} else if fn == "deleteCarById" {
+		return cc.deleteCarById(stub, args)
 	}
 
 	return shim.Success(nil)
@@ -127,7 +129,10 @@ func (cc *Chaincode) queryCarById(stub shim.ChaincodeStubInterface, args []strin
 }
 
 func (cc *Chaincode) changeCarOwner(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expect 2")
+	}
+
 	carId, err := strconv.Atoi(args[0])
 	if err != nil {
 	 	return	shim.Error("Incorrect Car Id. Expect a integer value")
@@ -144,6 +149,21 @@ func (cc *Chaincode) changeCarOwner(stub shim.ChaincodeStubInterface, args []str
 
 	newCarAsBytes, _ := json.Marshal(car)
 	stub.PutState(strconv.Itoa(carId), newCarAsBytes)
+	
+	return shim.Success(nil)
+}
+
+func (cc *Chaincode) deleteCarById(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expect 1")
+	}
+
+	carId, err := strconv.Atoi(args[0])
+	if err != nil {
+		return shim.Error("Incorrent Car Id. Expect a integer value")
+	}
+
+	stub.DelState(strconv.Itoa(carId))
 	
 	return shim.Success(nil)
 }
