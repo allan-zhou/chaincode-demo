@@ -73,6 +73,7 @@ func (cc *Chaincode) queryAllCars(stub shim.ChaincodeStubInterface, args []strin
 	}
 	defer resultsIterator.Close()
 
+	// 生产使用bytes.Buffer
 	strs := "["
 	for resultsIterator.HasNext() {
 		queryResult, err := resultsIterator.Next()
